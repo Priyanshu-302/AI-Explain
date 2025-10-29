@@ -1,0 +1,24 @@
+# Dependency directories
+node_modules
+
+# Configuration and Secrets (CRITICAL SECURITY)
+.env               # Your file containing MongoDB URI, JWT Secret, and API Keys
+
+# Logs and System Files
+npm-debug.log*
+yarn-error.log*
+.DS_Store          # macOS system files
+*.log
+
+# Build/Dist directories (Used for bundling frontends)
+# If you configure Tailwind to compile to a 'dist' folder
+/dist
+/build
+
+# IDE and Editor Files
+.vscode/           # Visual Studio Code settings
+.idea/             # JetBrains IDEs (WebStorm, IntelliJ)
+
+# Deployment Files (if you use tools like Serverless or Terraform)
+.serverless/
+.terraform/
