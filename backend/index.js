@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { GoogleGenAI } = require("@google/genai");
+const cors = require("cors");
 
 // --- 1. MODEL IMPORTS (MUST BE SEPARATE FILES) ---
 const User = require("./models/user");
@@ -14,6 +15,13 @@ const History = require("./models/history");
 const app = express();
 const PORT = process.env.PORT || 3000;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+
+app.use(
+  cors({
+    origin: ["http://127.0.0.1:5500", "null"], // You can specify your actual frontend domain/port if known, or use '*'
+    credentials: true,
+  })
+);
 
 // MongoDB Connection
 const connectDB = async () => {

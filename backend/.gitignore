@@ -1,10 +1,15 @@
-# Dependency directories
-node_modules
+Node dependencies
 
-# Configuration and Secrets (CRITICAL SECURITY)
-.env               # Your file containing MongoDB URI, JWT Secret, and API Keys
+/node_modules
 
-# Build/Dist directories (Used for bundling frontends)
-# If you configure Tailwind to compile to a 'dist' folder
-/dist
-/build
+Environment variables (CRITICAL FOR SECURITY)
+
+.env
+.env.*
+
+Logs and system files
+
+npm-debug.log*
+yarn-error.log*
+.DS_Store
+*.log
