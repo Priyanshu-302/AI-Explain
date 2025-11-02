@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { GoogleGenAI } = require("@google/genai");
-const cors = require("cors");
+const path = require("path");
 
 // --- 1. MODEL IMPORTS (MUST BE SEPARATE FILES) ---
 const User = require("./models/user");
@@ -15,25 +15,19 @@ const History = require("./models/history");
 const app = express();
 const PORT = process.env.PORT || 3000;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const ATLAS_URI = process.env.MONGO_URI;
 
-app.use(
-  cors({
-    origin: ["http://127.0.0.1:5500", "null"], // You can specify your actual frontend domain/port if known, or use '*'
-    credentials: true,
-  })
-);
+if (!ATLAS_URI) {
+  console.error("FATAL ERROR: MONGO_URI is not defined.");
+  process.exit(1);
+}
 
-// MongoDB Connection
-const connectDB = async () => {
-  try {
-    const conn = await mongoose.connect(process.env.MONGO_URI);
-    console.log(`\n✅ MongoDB Connected: ${conn.connection.host}`);
-  } catch (error) {
-    console.error(`\n❌ Error: ${error.message}`);
-    process.exit(1);
-  }
-};
-connectDB();
+mongoose
+  .connect(ATLAS_URI)
+  .then(() => console.log("MongoDB Atlas connected successfully!"))
+  .catch((err) => {
+    console.error("MongoDB Atlas connection failed:", err.message);
+  });
 
 // Gemini API Client Initialization
 if (!GEMINI_API_KEY) {
@@ -47,10 +41,6 @@ const BASIC_MODEL = "gemini-2.5-flash-lite";
 // --- MIDDLEWARE SETUP ---
 app.use(express.json());
 app.use(cookieParser());
-app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
-  next();
-});
 
 // --- 3. MIDDLEWARE DEFINITIONS (Protection & Metering) ---
 
@@ -68,7 +58,7 @@ const protect = async (req, res, next) => {
   }
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id).select("+password");
+    const user = await User.findById(decoded.id);
     if (!user) {
       return res
         .status(404)
@@ -119,9 +109,6 @@ const meteringGate = async (req, res, next) => {
 const registerUser = async (req, res) => {
   const { username, email, password } = req.body;
 
-  console.log("\n--- DEBUG: Register Attempt ---");
-  console.log("Received Body:", req.body);
-
   if (!username || !email || !password) {
     res
       .status(401)
@@ -143,15 +130,13 @@ const registerUser = async (req, res) => {
       role: user.role,
     };
 
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_LIFETIME,
-    });
+    const token = jwt.sign(payload, process.env.JWT_SECRET);
 
     const options = {
-      expires: new Date(Date.now() + parseInt(process.env.JWT_LIFETIME_MS)),
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: false,
+      sameSite: "none",
+      path: "/",
     };
 
     res
@@ -194,8 +179,6 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
-  console.log("\n--- DEBUG: Register Attempt ---");
-  console.log("Received Body:", req.body);
 
   if (!email || !password) {
     return res
@@ -219,15 +202,13 @@ const loginUser = async (req, res) => {
       role: user.role,
     };
 
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_LIFETIME,
-    });
+    const token = jwt.sign(payload, process.env.JWT_SECRET);
 
     const options = {
-      expires: new Date(Date.now() + parseInt(process.env.JWT_LIFETIME_MS)),
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: false,
+      sameSite: "lax",
+      path: "/",
     };
 
     res
@@ -253,10 +234,10 @@ const loginUser = async (req, res) => {
 
 const logoutUser = (req, res) => {
   res.cookie("token", "none", {
-    expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    secure: false,
+    sameSite: "lax",
+    path: "/",
   });
   res
     .status(200)
@@ -266,11 +247,12 @@ const logoutUser = (req, res) => {
 // To get the user profile
 const getMe = async (req, res) => {
   const user = await User.findById(req.user.id);
+  const firstName = user.username.trim().split(" ")[0];
   res.status(200).json({
     success: true,
     data: {
       id: user._id,
-      username: user.username,
+      username: firstName,
       email: user.email,
       role: user.role,
       credits: user.credits,
@@ -384,9 +366,11 @@ app.post("/api/explain", protect, meteringGate, generateExplanation);
 app.get("/api/user/history", protect, getHistory);
 
 app.get("/", (req, res) => {
-  res.send("AI Code Explainer API is running.");
+  res.sendFile(path.join(process.cwd(), "public", "index.html"));
 });
 
+app.use(express.static(path.join(__dirname, "public")));
+
 app.listen(PORT, () => {
-  console.log("localhost:3000 connected");
+  console.log(`Express server running on port ${PORT}.`);
 });
