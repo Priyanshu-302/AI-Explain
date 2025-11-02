@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Synapse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      @keyframes gradient-shift {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-20px);
+        }
+      }
+      @keyframes slide-in {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes pulse-glow {
+        0%,
+        100% {
+          box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+        }
+        50% {
+          box-shadow: 0 0 40px rgba(99, 102, 241, 0.8);
+        }
+      }
+      .gradient-bg {
+        background: linear-gradient(-45deg, #0f172a, #1e1b4b, #1e293b, #312e81);
+        background-size: 400% 400%;
+        animation: gradient-shift 15s ease infinite;
+      }
+      .glass-effect {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+      }
+      .slide-in {
+        animation: slide-in 0.8s ease-out forwards;
+      }
+      .animate-pulse-glow {
+        animation: pulse-glow 2s ease-in-out infinite;
+      }
+      .hover-lift {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .hover-lift:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+      }
+      .input-focus {
+        transition: all 0.3s ease;
+      }
+      .input-focus:focus {
+        border-color: rgba(99, 102, 241, 0.8);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+      }
+      .floating-shapes {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: 0;
+      }
+      .shape {
+        position: absolute;
+        opacity: 0.1;
+        animation: float 7s ease-in-out infinite;
+      }
+      .shape-1 {
+        top: 10%;
+        right: 15%;
+        width: 120px;
+        height: 120px;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+      }
+      .shape-2 {
+        top: 50%;
+        left: 5%;
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, #8b5cf6, #ec4899);
+        border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%;
+        animation: float 10s ease-in-out infinite reverse;
+      }
+      .shape-3 {
+        bottom: 15%;
+        right: 10%;
+        width: 90px;
+        height: 90px;
+        background: linear-gradient(135deg, #3b82f6, #6366f1);
+        border-radius: 50%;
+      }
+    </style>
+  </head>
+  <body
+    class="gradient-bg min-h-screen text-white flex items-center justify-center p-6 relative"
+  >
+    <div class="floating-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+    </div>
+    <a
+      href="/index.html"
+      class="absolute top-6 left-6 glass-effect px-4 py-2 rounded-lg hover:border-indigo-500 transition-all flex items-center space-x-2 z-10"
+    >
+      <i class="fas fa-arrow-left"></i>
+      <span>Back to Home</span>
+    </a>
+    <div class="w-full max-w-md relative z-10">
+      <div class="text-center mb-8 slide-in">
+        <div
+          class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl mb-4 animate-pulse-glow"
+        >
+          <i class="fas fa-code text-3xl"></i>
+        </div>
+        <h1
+          class="text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent"
+        >
+          Synapse
+        </h1>
+      </div>
+      <div
+        class="glass-effect rounded-2xl p-8 slide-in"
+        style="animation-delay: 0.1s"
+      >
+        <h2 id="formTitle" class="text-3xl font-bold mb-2">Welcome Back</h2>
+        <p id="formSubtitle" class="text-gray-400 mb-8">
+          Login to continue your coding journey
+        </p>
+        <div class="flex border-b border-slate-600 mb-6">
+          <button
+            id="showLogin"
+            class="flex-1 py-3 text-lg font-semibold border-b-2 border-indigo-500 text-indigo-400 transition-colors"
+          >
+            Login
+          </button>
+          <button
+            id="showRegister"
+            class="flex-1 py-3 text-lg font-semibold border-b-2 border-transparent text-gray-400 hover:text-white transition-colors"
+          >
+            Register
+          </button>
+        </div>
+        <form id="loginForm" class="space-y-5">
+          <div id="loginFormBody">
+            <div class="relative mb-4">
+              <i
+                class="fas fa-envelope absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 pointer-events-none"
+              ></i>
+              <input
+                type="email"
+                id="loginEmail"
+                name="email"
+                placeholder="Email Address"
+                required
+                class="w-full bg-slate-800 text-white pl-12 pr-4 py-3 rounded-lg border border-slate-700 focus:outline-none input-focus"
+              />
+            </div>
+            <div class="relative mb-6">
+              <i
+                class="fas fa-lock absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 pointer-events-none"
+              ></i>
+              <input
+                type="password"
+                id="loginPassword"
+                name="password"
+                placeholder="••••••••"
+                required
+                class="w-full bg-slate-800 text-white pl-12 pr-4 py-3 rounded-lg border border-slate-700 focus:outline-none input-focus"
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg font-semibold hover:from-indigo-600 hover:to-purple-700 transition-all duration-300 hover-lift"
+          >
+            Login to Dashboard
+          </button>
+          <a
+            href="#"
+            class="block text-center text-sm text-indigo-400 hover:text-indigo-300 transition-colors mt-3"
+            >Forgot password?</a
+          >
+        </form>
+        <form id="registerForm" class="space-y-5 hidden">
+          <div id="registerFormBody">
+            <div class="relative mb-4">
+              <i
+                class="fas fa-user absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 pointer-events-none"
+              ></i>
+              <input
+                type="text"
+                id="regUsername"
+                name="username"
+                placeholder="Username"
+                required
+                class="w-full bg-slate-800 text-white pl-12 pr-4 py-3 rounded-lg border border-slate-700 focus:outline-none input-focus"
+              />
+            </div>
+            <div class="relative mb-4">
+              <i
+                class="fas fa-envelope absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 pointer-events-none"
+              ></i>
+              <input
+                type="email"
+                id="regEmail"
+                name="email"
+                placeholder="Email Address"
+                required
+                class="w-full bg-slate-800 text-white pl-12 pr-4 py-3 rounded-lg border border-slate-700 focus:outline-none input-focus"
+              />
+            </div>
+            <div class="relative mb-6">
+              <i
+                class="fas fa-lock absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 pointer-events-none"
+              ></i>
+              <input
+                type="password"
+                id="regPassword"
+                name="password"
+                placeholder="Password (Min 6 chars)"
+                required
+                class="w-full bg-slate-800 text-white pl-12 pr-4 py-3 rounded-lg border border-slate-700 focus:outline-none input-focus"
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg font-semibold hover:from-indigo-600 hover:to-purple-700 transition-all duration-300 hover-lift"
+          >
+            Create Account
+          </button>
+        </form>
+        <p id="authError" class="text-red-400 text-center mt-4 hidden"></p>
+        <div class="flex items-center my-6">
+          <div class="flex-1 border-t border-slate-700"></div>
+          <span class="px-4 text-gray-400 text-sm">or continue with</span>
+          <div class="flex-1 border-t border-slate-700"></div>
+        </div>
+
+        <button
+          onclick="handleGoogleAuth()"
+          class="w-full glass-effect border border-slate-600 hover:border-indigo-500 px-4 py-3 rounded-lg transition-all hover-lift flex items-center justify-center space-x-3"
+        >
+          <svg class="w-5 h-5" viewBox="0 0 24 24">
+            <path
+              fill="#4285F4"
+              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+            />
+            <path
+              fill="#34A853"
+              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+            />
+            <path
+              fill="#FBBC05"
+              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+            />
+            <path
+              fill="#EA4335"
+              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+            />
+          </svg>
+          <span class="font-semibold" id="googleAuthText"
+            >Continue with Google</span
+          >
+        </button>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE_URL = "/api/auth";
+
+      const loginForm = document.getElementById("loginForm");
+      const registerForm = document.getElementById("registerForm");
+      const showLoginBtn = document.getElementById("showLogin");
+      const showRegisterBtn = document.getElementById("showRegister");
+      const formTitle = document.getElementById("formTitle");
+      const formSubtitle = document.getElementById("formSubtitle");
+      const authError = document.getElementById("authError");
+
+      // --- Error Display ---
+      const displayAuthError = (message) => {
+        authError.textContent = message;
+        authError.classList.remove("hidden");
+      };
+
+      // --- UI State Toggle ---
+      const setActiveTab = (isLogin) => {
+        authError.classList.add("hidden");
+
+        if (isLogin) {
+          loginForm.classList.remove("hidden");
+          registerForm.classList.add("hidden");
+          showLoginBtn.classList.add("border-indigo-500", "text-indigo-400");
+          showLoginBtn.classList.remove("border-transparent", "text-gray-400");
+          showRegisterBtn.classList.remove(
+            "border-indigo-500",
+            "text-indigo-400"
+          );
+          showRegisterBtn.classList.add("border-transparent", "text-gray-400");
+          formTitle.textContent = "Welcome Back";
+          formSubtitle.textContent = "Login to continue your coding journey";
+        } else {
+          registerForm.classList.remove("hidden");
+          loginForm.classList.add("hidden");
+          showRegisterBtn.classList.add("border-indigo-500", "text-indigo-400");
+          showRegisterBtn.classList.remove(
+            "border-transparent",
+            "text-gray-400"
+          );
+          showLoginBtn.classList.remove("border-indigo-500", "text-indigo-400");
+          showLoginBtn.classList.add("border-transparent", "text-gray-400");
+          formTitle.textContent = "Create Account";
+          formSubtitle.textContent =
+            "Get 50 free queries to start explaining code";
+        }
+      };
+
+      showLoginBtn.addEventListener("click", () => setActiveTab(true));
+      showRegisterBtn.addEventListener("click", () => setActiveTab(false));
+
+      // --- Button Loader ---
+      function setButtonLoading(button, isLoading, originalText) {
+        button.disabled = isLoading;
+        if (originalText.includes("fa-spinner")) {
+          button.innerHTML = isLoading
+            ? '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...'
+            : originalText;
+        } else {
+          button.textContent = isLoading ? "Processing..." : originalText;
+        }
+      }
+
+      // --- Universal Auth Request Handler ---
+      async function handleAuthRequest(
+        endpoint,
+        body,
+        button,
+        isRegister = false
+      ) {
+        const originalText = button.innerHTML;
+        setButtonLoading(button, true, originalText);
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+            credentials: "include", // ✅ send/receive cookies
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            if (isRegister) {
+              document.getElementById("loginEmail").value = body.email;
+              setActiveTab(true);
+            } else {
+              console.log("✅ Login successful:", data);
+              // ✅ Redirect after cookie is set
+              setTimeout(() => {
+                window.location.href = "dashboard.html";
+              }, 500);
+            }
+          } else {
+            displayAuthError(
+              data.error || "Authentication failed. Please check credentials."
+            );
+          }
+        } catch (error) {
+          console.error("Network error:", error);
+          displayAuthError(
+            "Could not connect to the server. Check backend status."
+          );
+        } finally {
+          // Restore button if not redirected
+          if (window.location.pathname.includes("login.html")) {
+            setButtonLoading(button, false, originalText);
+          }
+        }
+      }
+
+      // --- LOGIN SUBMISSION ---
+      loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = document.getElementById("loginEmail").value.trim();
+        const password = document.getElementById("loginPassword").value.trim();
+        const button = e.submitter;
+
+        if (!email || !password) {
+          displayAuthError("Please fill in all fields.");
+          return;
+        }
+
+        await handleAuthRequest("login", { email, password }, button);
+      });
+
+      // --- REGISTER SUBMISSION ---
+      registerForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const username = document.getElementById("regUsername").value.trim();
+        const email = document.getElementById("regEmail").value.trim();
+        const password = document.getElementById("regPassword").value.trim();
+        const button = e.submitter;
+
+        if (!username || !email || !password) {
+          displayAuthError("Please fill in all fields.");
+          return;
+        }
+
+        await handleAuthRequest(
+          "register",
+          { username, email, password },
+          button,
+          true
+        );
+      });
+
+      // --- LOGOUT HANDLER ---
+      async function logoutUser() {
+        try {
+          await fetch(`${API_BASE_URL}/logout`, {
+            method: "POST",
+            credentials: "include",
+          });
+        } catch (err) {
+          console.error("Logout failed:", err);
+        } finally {
+          window.location.href = "login.html";
+        }
+      }
+
+      // --- ON PAGE LOAD ---
+      document.addEventListener("DOMContentLoaded", async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/me`, {
+            method: "GET",
+            credentials: "include", // ✅ send cookie
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            console.log(
+              "✅ Already logged in as:",
+              data.data?.email || "Unknown"
+            );
+
+            // If on login page → go to dashboard
+            if (window.location.pathname.includes("login.html")) {
+              window.location.href = "dashboard.html";
+            }
+          } else {
+            // If on dashboard but not logged in → go to login
+            if (window.location.pathname.includes("dashboard.html")) {
+              window.location.href = "login.html";
+            } else {
+              setActiveTab(true);
+            }
+          }
+        } catch (error) {
+          console.error("Error verifying login:", error);
+          setActiveTab(true);
+        }
+      });
+    </script>
+  </body>
+</html>
